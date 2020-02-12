@@ -1,8 +1,11 @@
 import React, { PureComponent } from 'react'
 import { View, Text, Switch, StyleSheet } from 'react-native'
+import { NativeEventEmitter, NativeModules  } from 'react-native'
 import stripe from 'tipsi-stripe'
 import Button from '../components/Button'
 import testID from '../utils/testID'
+
+
 
 /* eslint-disable no-console */
 export default class ApplePayScreen extends PureComponent {
@@ -19,8 +22,10 @@ export default class ApplePayScreen extends PureComponent {
     masterCardAvailable: false,
     visaAvailable: false,
   }
+  async componentDidMount() {
+    const eventEmitter = new NativeEventEmitter(NativeModules.StripeModule);
+    this.subscription = eventEmitter.addListener('ShippingMethodDidChange', this.handleShippingMethodChange)
 
-  async componentWillMount() {
     const allowed = await stripe.deviceSupportsNativePay()
     const amexAvailable = await stripe.canMakeNativePayPayments({
       networks: ['american_express'],
@@ -41,6 +46,10 @@ export default class ApplePayScreen extends PureComponent {
       masterCardAvailable,
       visaAvailable,
     })
+  }
+
+  componentWillUnmount() {
+    this.subscription.remove()
   }
 
   handleCompleteChange = complete => (
@@ -87,6 +96,20 @@ export default class ApplePayScreen extends PureComponent {
     } catch (error) {
       this.setState({ loading: false, status: `Error: ${error.message}` })
     }
+  }
+
+  handleShippingMethodChange = (method) => {
+    console.log(method)
+    const cartItems = [{
+      "label": "How Does It Feel? - Hardcover",
+      "amount": "39.99"
+    },
+    {
+      "label": "Shop Catalog",
+      "amount": "39.99"
+    }
+    ]
+    stripe.updateSummaryItems(cartItems)
   }
 
   handleSetupApplePayPress = () => (
