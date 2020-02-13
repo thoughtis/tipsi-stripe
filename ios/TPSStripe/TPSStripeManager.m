@@ -469,8 +469,11 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
                   rejecter:(RCTPromiseRejectBlock)reject) {
     NSArray *summaryItems = [self summaryItemsFromItems:items];
     if (shippingMethodCompletion) {
-        resolve(shippingMethodCompletion([[PKPaymentRequestShippingMethodUpdate alloc] initWithPaymentSummaryItems:summaryItems]));
+        promiseResolver = resolve;
+        shippingMethodCompletion([[PKPaymentRequestShippingMethodUpdate alloc] initWithPaymentSummaryItems:summaryItems]);
         shippingMethodCompletion = nil;
+    } else {
+        resolve(nil);
     }
 }
 
