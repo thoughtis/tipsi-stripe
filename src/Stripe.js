@@ -91,6 +91,16 @@ class Stripe {
     })()
   }
 
+  updateSummaryItems(items = []) {
+    checkInit(this)
+    checkArgs(
+      types.paymentRequestWithApplePayItemsPropTypes,
+      { items }, 'items', 'Stripe.paymentRequestWithApplePay'
+    )
+
+    return StripeModule.updateSummaryItems(items)
+  }
+
   // @deprecated use completeNativePayRequest
   completeApplePayRequest = () => {
     checkInit(this)

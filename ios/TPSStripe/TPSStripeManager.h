@@ -10,9 +10,11 @@
 #import <PassKit/PassKit.h>
 #import <Stripe/Stripe.h>
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 #import <React/RCTConvert.h>
 
-@interface StripeModule : NSObject <RCTBridgeModule, PKPaymentAuthorizationViewControllerDelegate, STPAddCardViewControllerDelegate>
+API_AVAILABLE(ios(11.0))
+@interface StripeModule : RCTEventEmitter <RCTBridgeModule, PKPaymentAuthorizationViewControllerDelegate, STPAddCardViewControllerDelegate>
 
 @property (nonatomic) STPRedirectContext *redirectContext;
 
