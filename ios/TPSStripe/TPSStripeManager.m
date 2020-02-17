@@ -28,6 +28,7 @@ NSString * const kErrorKeyNoMerchantIdentifier = @"noMerchantIdentifier";
 NSString * const kErrorKeyNoAmount = @"noAmount";
 
 NSString * const kShippingEventName = @"ShippingMethodDidChange";
+NSString * const kContactEventName = @"ShippingAddressDidChange";
 
 @implementation RCTConvert (STPBankAccountHolderType)
 
@@ -151,7 +152,7 @@ RCT_EXPORT_MODULE();
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-    return @[kShippingEventName];
+    return @[kShippingEventName, kContactEventName];
 }
 
 RCT_EXPORT_METHOD(init:(NSDictionary *)options errorCodes:(NSDictionary *)errors) {
