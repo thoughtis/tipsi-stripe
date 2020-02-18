@@ -630,7 +630,7 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
             @"country":  address.ISOCountryCode.uppercaseString,
             @"postalCode": address.postalCode,
             @"city": address.city
-        }
+        };
         [self sendEventWithName:kShippingAddressEventName body:contactInfo];
     }
 }
