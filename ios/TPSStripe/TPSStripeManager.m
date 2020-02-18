@@ -474,7 +474,26 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
         promiseResolver = resolve;
         shippingMethodCompletion([[PKPaymentRequestShippingMethodUpdate alloc] initWithPaymentSummaryItems:summaryItems]);
         shippingMethodCompletion = nil;
-    } else {
+    }
+    else {
+        resolve(nil);
+    }
+}
+
+/// Callback to update summary items and total when shipping method changes
+RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
+                  forSummaryItems: (NSArray *)items
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSArray *shippingMethods = [self shippingMethodsFromItems:methods];;
+    NSArray *summaryItems = [self summaryItemsFromItems:items];
+    if (shippingContactCompletion) {
+        PKPaymentRequestShippingContactUpdate *update = [[PKPaymentRequestShippingContactUpdate alloc] initWithPaymentSummaryItems:summaryItems];
+        update.shippingMethods = shippingMethods;
+        shippingContactCompletion(update);
+        shippingContactCompletion = nil;
+    }
+    else {
         resolve(nil);
     }
 }
