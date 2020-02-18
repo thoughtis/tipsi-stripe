@@ -115,6 +115,7 @@ NSString * const TPSPaymentNetworkVisa = @"visa";
 
     void (^applePayCompletion)(PKPaymentAuthorizationStatus);
     void (^ _Nullable shippingMethodCompletion)(PKPaymentRequestShippingMethodUpdate * _Nonnull);
+    void (^ _Nullable shippingContactCompletion)(PKPaymentRequestShippingContactUpdate * _Nonnull);
     NSError *applePayStripeError;
 }
 
@@ -618,13 +619,29 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
 
 #pragma mark PKPaymentAuthorizationViewControllerDelegate
 
+- (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller didSelectShippingContact:(PKContact *)contact handler:(void (^)(PKPaymentRequestShippingContactUpdate * _Nonnull))completion {
+    NSLog(@"didSelectShippingContact");
+    if (hasListeners) {
+        shippingContactCompletion = completion;
+        CNPostalAddress *address = contact.postalAddress.copy;
+        NSDictionary *contactInfo = @{
+            @"city": address.city,
+            @"state": address.state,
+            @"country":  address.ISOCountryCode.uppercaseString,
+            @"postalCode": address.postalCode,
+            @"city": address.city
+        }
+        [self sendEventWithName:kShippingAddressEventName body:contactInfo];
+    }
+}
+
 - (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller
                    didSelectShippingMethod:(PKShippingMethod *)shippingMethod
                                    handler:(void (^)(PKPaymentRequestShippingMethodUpdate *update))completion  API_AVAILABLE(ios(11.0)){
     NSLog(@"didSelectShippingMethod");
     if (hasListeners) {
         shippingMethodCompletion = completion;
-        [self sendEventWithName: kShippingEventName body:@{@"shipping_id": shippingMethod.identifier} ];
+        [self sendEventWithName: kShippingMethodEventName body:@{@"shipping_id": shippingMethod.identifier} ];
     }
 }
 
