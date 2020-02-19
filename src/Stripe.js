@@ -105,7 +105,7 @@ class Stripe {
     checkInit(this)
     checkArgs(
       types.updateShippingMethodsPropTypes,
-      methods, 'methods', 'Stripe.handleAddressChange'
+      { methods }, 'shippingMethods', 'Stripe.handleAddressChange'
     )
     
     checkArgs(
