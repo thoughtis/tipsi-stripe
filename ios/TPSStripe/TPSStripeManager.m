@@ -27,7 +27,8 @@ NSString * const kErrorKeyNoPaymentRequest = @"noPaymentRequest";
 NSString * const kErrorKeyNoMerchantIdentifier = @"noMerchantIdentifier";
 NSString * const kErrorKeyNoAmount = @"noAmount";
 
-NSString * const kShippingEventName = @"ShippingMethodDidChange";
+NSString * const kShippingMethodEventName = @"ShippingMethodDidChange";
+NSString * const kShippingAddressEventName = @"ShippingAddressDidChange";
 
 @implementation RCTConvert (STPBankAccountHolderType)
 
@@ -114,6 +115,7 @@ NSString * const TPSPaymentNetworkVisa = @"visa";
 
     void (^applePayCompletion)(PKPaymentAuthorizationStatus);
     void (^ _Nullable shippingMethodCompletion)(PKPaymentRequestShippingMethodUpdate * _Nonnull);
+    void (^ _Nullable shippingContactCompletion)(PKPaymentRequestShippingContactUpdate * _Nonnull);
     NSError *applePayStripeError;
 }
 
@@ -151,7 +153,7 @@ RCT_EXPORT_MODULE();
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-    return @[kShippingEventName];
+    return @[kShippingMethodEventName, kShippingAddressEventName];
 }
 
 RCT_EXPORT_METHOD(init:(NSDictionary *)options errorCodes:(NSDictionary *)errors) {
@@ -472,7 +474,26 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
         promiseResolver = resolve;
         shippingMethodCompletion([[PKPaymentRequestShippingMethodUpdate alloc] initWithPaymentSummaryItems:summaryItems]);
         shippingMethodCompletion = nil;
-    } else {
+    }
+    else {
+        resolve(nil);
+    }
+}
+
+/// Callback to update summary items and total when shipping method changes
+RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
+                  forSummaryItems: (NSArray *)items
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    NSArray *shippingMethods = [self shippingMethodsFromItems:methods];;
+    NSArray *summaryItems = [self summaryItemsFromItems:items];
+    if (shippingContactCompletion) {
+        PKPaymentRequestShippingContactUpdate *update = [[PKPaymentRequestShippingContactUpdate alloc] initWithPaymentSummaryItems:summaryItems];
+        update.shippingMethods = shippingMethods;
+        shippingContactCompletion(update);
+        shippingContactCompletion = nil;
+    }
+    else {
         resolve(nil);
     }
 }
@@ -617,13 +638,29 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
 
 #pragma mark PKPaymentAuthorizationViewControllerDelegate
 
+- (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller didSelectShippingContact:(PKContact *)contact handler:(void (^)(PKPaymentRequestShippingContactUpdate * _Nonnull))completion {
+//    NSLog(@"didSelectShippingContact");
+    if (hasListeners) {
+        shippingContactCompletion = completion;
+        CNPostalAddress *address = contact.postalAddress.copy;
+        NSDictionary *contactInfo = @{
+            @"city": address.city,
+            @"state": address.state,
+            @"country":  address.ISOCountryCode.uppercaseString,
+            @"postalCode": address.postalCode,
+            @"city": address.city
+        };
+        [self sendEventWithName:kShippingAddressEventName body:contactInfo];
+    }
+}
+
 - (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller
                    didSelectShippingMethod:(PKShippingMethod *)shippingMethod
                                    handler:(void (^)(PKPaymentRequestShippingMethodUpdate *update))completion  API_AVAILABLE(ios(11.0)){
-    NSLog(@"didSelectShippingMethod");
+//    NSLog(@"didSelectShippingMethod");
     if (hasListeners) {
         shippingMethodCompletion = completion;
-        [self sendEventWithName: kShippingEventName body:@{@"shipping_id": shippingMethod.identifier} ];
+        [self sendEventWithName: kShippingMethodEventName body:@{@"shipping_id": shippingMethod.identifier} ];
     }
 }
 

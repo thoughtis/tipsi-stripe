@@ -101,6 +101,21 @@ class Stripe {
     return StripeModule.updateSummaryItems(items)
   }
 
+   handleAddressChange(methods = [], items = []) {
+    checkInit(this)
+    checkArgs(
+      types.updateShippingMethodsPropTypes,
+      methods, 'shippingMethods', 'Stripe.handleAddressChange'
+    )
+    
+    checkArgs(
+      types.paymentRequestWithApplePayItemsPropTypes,
+      { items }, 'items', 'Stripe.paymentRequestWithApplePay'
+    )
+
+    return StripeModule.updateShippingMethods(methods, items)
+  }
+
   // @deprecated use completeNativePayRequest
   completeApplePayRequest = () => {
     checkInit(this)

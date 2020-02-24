@@ -24,7 +24,8 @@ export default class ApplePayScreen extends PureComponent {
   }
   async componentDidMount() {
     const eventEmitter = new NativeEventEmitter(NativeModules.StripeModule);
-    this.subscription = eventEmitter.addListener('ShippingMethodDidChange', this.handleShippingMethodChange)
+    this.shippingSubscription = eventEmitter.addListener('ShippingMethodDidChange', this.handleShippingMethodChange)
+    this.addressSubscription = eventEmitter.addListener('ShippingAddressDidChange', this.handleAddressChange)
 
     const allowed = await stripe.deviceSupportsNativePay()
     const amexAvailable = await stripe.canMakeNativePayPayments({
@@ -49,7 +50,8 @@ export default class ApplePayScreen extends PureComponent {
   }
 
   componentWillUnmount() {
-    this.subscription.remove()
+    this.shippingSubscription.remove()
+    this.addressSubscription.remove()
   }
 
   handleCompleteChange = complete => (
@@ -110,6 +112,40 @@ export default class ApplePayScreen extends PureComponent {
     }
     ]
     stripe.updateSummaryItems(cartItems)
+  }
+
+  handleAddressChange = (address) => {
+    console.log(address)
+    const cartItems = [{
+      "label": "How Does It Feel? - Hardcover",
+      "amount": "39.99"
+    },
+    {
+      "label": "Shop Catalog",
+      "amount": "39.99"
+    }
+    ]
+    const methods = [
+      {
+        "id": "flexible_shipping_5_1",
+        "label": "Standard",
+        "detail": "Standard: $4.99",
+        "amount": "4.99"
+      },
+      {
+        "id": "flexible_shipping_5_2",
+        "label": "Expedited",
+        "detail": "Expedited: $24.99",
+        "amount": "24.99"
+      },
+      {
+        "id": "basic_shipping",
+        "label": "Free",
+        "detail": "Basic Shipping",
+        "amount": "0.00"
+      }
+    ]
+    stripe.handleAddressChange(methods, cartItems)
   }
 
   handleSetupApplePayPress = () => (
