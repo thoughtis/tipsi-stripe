@@ -474,7 +474,6 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
         promiseResolver = resolve;
         shippingMethodCompletion([[PKPaymentRequestShippingMethodUpdate alloc] initWithPaymentSummaryItems:summaryItems]);
         shippingMethodCompletion = nil;
-<<<<<<< HEAD
     }
     else {
         resolve(nil);
@@ -495,9 +494,6 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
         shippingContactCompletion = nil;
     }
     else {
-=======
-    } else {
->>>>>>> 0e1fc00391b26bf4a57c83a71979b768a803062f
         resolve(nil);
     }
 }
@@ -506,7 +502,6 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
 
 - (NSArray *)shippingMethodsFromItems: (NSArray *)items {
     NSMutableArray *shippingMethods = [NSMutableArray array];
-<<<<<<< HEAD
 
     for (NSDictionary *item in items) {
         PKShippingMethod *shippingItem = [[PKShippingMethod alloc] init];
@@ -534,35 +529,6 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
     return summaryItems;
 }
 
-=======
-
-    for (NSDictionary *item in items) {
-        PKShippingMethod *shippingItem = [[PKShippingMethod alloc] init];
-        shippingItem.label = item[@"label"];
-        shippingItem.detail = item[@"detail"];
-        shippingItem.amount = [NSDecimalNumber decimalNumberWithString:item[@"amount"]];
-        shippingItem.identifier = item[@"id"];
-        [shippingMethods addObject:shippingItem];
-    }
-
-    return shippingMethods;
-}
-
-- (NSArray *)summaryItemsFromItems: (NSArray *)items {
-    NSMutableArray *summaryItems = [NSMutableArray array];
-
-    for (NSDictionary *item in items) {
-        PKPaymentSummaryItem *summaryItem = [PKPaymentSummaryItem new];
-        summaryItem.label = item[@"label"];
-        summaryItem.amount = [NSDecimalNumber decimalNumberWithString:item[@"amount"]];
-        summaryItem.type = [@"pending" isEqualToString:item[@"type"]] ? PKPaymentSummaryItemTypePending : PKPaymentSummaryItemTypeFinal;
-        [summaryItems addObject:summaryItem];
-    }
-
-    return summaryItems;
-}
-
->>>>>>> 0e1fc00391b26bf4a57c83a71979b768a803062f
 
 - (STPCardParams *)createCard:(NSDictionary *)params {
     STPCardParams *cardParams = [[STPCardParams alloc] init];
