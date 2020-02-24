@@ -639,7 +639,7 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
 #pragma mark PKPaymentAuthorizationViewControllerDelegate
 
 - (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller didSelectShippingContact:(PKContact *)contact handler:(void (^)(PKPaymentRequestShippingContactUpdate * _Nonnull))completion {
-    NSLog(@"didSelectShippingContact");
+//    NSLog(@"didSelectShippingContact");
     if (hasListeners) {
         shippingContactCompletion = completion;
         CNPostalAddress *address = contact.postalAddress.copy;
@@ -657,20 +657,10 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
 - (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller
                    didSelectShippingMethod:(PKShippingMethod *)shippingMethod
                                    handler:(void (^)(PKPaymentRequestShippingMethodUpdate *update))completion  API_AVAILABLE(ios(11.0)){
-    NSLog(@"didSelectShippingMethod");
+//    NSLog(@"didSelectShippingMethod");
     if (hasListeners) {
         shippingMethodCompletion = completion;
         [self sendEventWithName: kShippingMethodEventName body:@{@"shipping_id": shippingMethod.identifier} ];
-    }
-}
-
-- (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller
-                   didSelectShippingMethod:(PKShippingMethod *)shippingMethod
-                                   handler:(void (^)(PKPaymentRequestShippingMethodUpdate *update))completion  API_AVAILABLE(ios(11.0)){
-    NSLog(@"didSelectShippingMethod");
-    if (hasListeners) {
-        shippingMethodCompletion = completion;
-        [self sendEventWithName: kShippingEventName body:@{@"shipping_id": shippingMethod.identifier} ];
     }
 }
 
