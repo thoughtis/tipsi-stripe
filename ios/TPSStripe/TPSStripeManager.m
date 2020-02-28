@@ -476,7 +476,8 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
         shippingMethodCompletion = nil;
     }
     else {
-        resolve(nil);
+        NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
+        reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
     }
 }
 
@@ -494,7 +495,8 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
         shippingContactCompletion = nil;
     }
     else {
-        resolve(nil);
+        NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
+        reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
     }
 }
 
