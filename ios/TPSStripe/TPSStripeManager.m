@@ -469,11 +469,6 @@ RCT_EXPORT_METHOD(openApplePaySetup) {
 RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if(!requestIsCompleted) {
-        NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
-        reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
-        return;
-    }
     NSArray *summaryItems = [self summaryItemsFromItems:items];
     if (shippingMethodCompletion) {
         promiseResolver = resolve;
@@ -481,7 +476,8 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
         shippingMethodCompletion = nil;
     }
     else {
-        resolve(nil);
+       NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
+        reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
     }
 }
 
@@ -490,12 +486,6 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
                   forSummaryItems: (NSArray *)items
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    if(!requestIsCompleted) {
-        NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
-        reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
-        return;
-    }
-
     NSArray *shippingMethods = [self shippingMethodsFromItems:methods];;
     NSArray *summaryItems = [self summaryItemsFromItems:items];
     if (shippingContactCompletion) {
@@ -505,7 +495,8 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
         shippingContactCompletion = nil;
     }
     else {
-        resolve(nil);
+       NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
+        reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
     }
 }
 
