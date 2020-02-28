@@ -476,7 +476,7 @@ RCT_EXPORT_METHOD(updateSummaryItems: (NSArray *)items
         shippingMethodCompletion = nil;
     }
     else {
-       NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
+        NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
         reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
     }
 }
@@ -495,7 +495,7 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
         shippingContactCompletion = nil;
     }
     else {
-       NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
+        NSDictionary *error = [errorCodes valueForKey:kErrorKeyBusy];
         reject(error[kErrorKeyCode], error[kErrorKeyDescription], nil);
     }
 }
@@ -675,16 +675,16 @@ RCT_EXPORT_METHOD(updateShippingMethods: (NSArray *)methods
     STPAPIClient *stripeAPIClient = [self newAPIClient];
     __weak __typeof__(self) weakSelf = self;
 
-    [stripeAPIClient createTokenWithPayment:payment completion:^(STPToken * _Nullable token, NSError * _Nullable error) {
+    [stripeAPIClient createSourceWithPayment:payment completion:^(STPSource * _Nullable source, NSError * _Nullable error) {
         __typeof__(self) strongSelf = weakSelf;
         strongSelf->requestIsCompleted = YES;
 
-        if (error) {
+        if (source == nil || error != nil) {
             // Save for deffered use
             strongSelf->applePayStripeError = error;
             [strongSelf resolveApplePayCompletion:PKPaymentAuthorizationStatusFailure];
         } else {
-            NSDictionary *result = [strongSelf convertTokenObject:token];
+            NSDictionary *result = [strongSelf convertSourceObject:source];
             NSDictionary *extra = @{
                 @"billingContact": [strongSelf contactDetails:payment.billingContact] ?: [NSNull null],
                 @"shippingContact": [strongSelf contactDetails:payment.shippingContact] ?: [NSNull null],
